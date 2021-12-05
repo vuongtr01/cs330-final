@@ -24,6 +24,11 @@ def item_details(item_id):
         )
     return render_template('store/item.html', item = item)
 
+@bp.route('/item/orders')
+@login_required
+def orders():
+    return render_template('store/orders.html')
+
 @bp.route('/checkout')
 @login_required
 def checkout():

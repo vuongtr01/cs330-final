@@ -22,9 +22,9 @@ CREATE TABLE order_history(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     book_id INTEGER NOT NULL,
-    order_time TIMESTAMP,
-    total_price INTEGER,
+    order_time INTEGER NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users (id),
     FOREIGN KEY (book_id) REFERENCES books (id)
 );
 
+INSERT into users (username, password, email) Values ('test1', '12345678', "test1@gmail.com");

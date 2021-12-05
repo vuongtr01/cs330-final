@@ -2,6 +2,8 @@
 /* jshint browser: true */
 "use strict;";
 
+var HOST_URL = window.location.origin;
+
 function populate_cart(){
     let cart_items = window.localStorage.getItem('local_cart') ? JSON.parse(window.localStorage.getItem('local_cart')) : [];
 
@@ -14,7 +16,7 @@ function populate_cart(){
             author,
             img_url,
             publication_year,
-            publisher,
+            title,
             amount
         } = cart_items[i];
         // create div tag that contain item's content
@@ -33,22 +35,8 @@ function populate_cart(){
         // create div tag that contains item's name
         let name_div = document.createElement("div");
         name_div.setAttribute("class", "d-flex flex-column align-items-center");
-        name_div.innerHTML = name;
+        name_div.innerHTML = title;
         item_div.appendChild(name_div);
-
-        // create div tag that contains item's quantity
-        let qty_div = document.createElement("div");
-        let label = document.createElement("span");
-        label.innerHTML = "Qty:";
-        let input_amount = document.createElement("input");
-        input_amount.setAttribute("type", "number");
-        input_amount.setAttribute("min", "1");
-        input_amount.setAttribute("value", amount);
-        input_amount.setAttribute("style", "max-width: 3rem");
-        input_amount.setAttribute("id", `amount-${id}`);
-        qty_div.appendChild(label);
-        qty_div.appendChild(input_amount);
-        item_div.appendChild(qty_div);
 
         // create div tag to contain remove item button
         let remove_div = document.createElement("div");
@@ -68,27 +56,26 @@ function populate_cart(){
 
 }
 
-function removeItem(element){
+async function process_checkout(){
+    let completeCheckoutPage = window.location.origin + "/store/complete-checkout";
     let cart_items = window.localStorage.getItem('local_cart') ? JSON.parse(window.localStorage.getItem('local_cart')) : [];
-    let itemCard = element.parentElement.parentElement;
-    let itemId = itemCard.id.split("-")[1];
-
-    itemCard.parentElement.removeChild(itemCard);
-    for(let i=0; i < cart_items.length; ++i){
-        const {id} = cart_items[i];
-        if (id == itemId){
-            cart_items.splice(i,1);
+    let sendingTime = Date.parse(new Date());
+    let borrowedItem = cart_items.map(item => {return {"id": item.id, "time": sendingTime}});
+    if (borrowedItem.length > 0){
+        let resquestResponse = await fetch(HOST_URL + "/api/book/checkout", {
+            method: "POST",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
+            body: JSON.stringify(borrowedItem)
+        });
+        if (resquestResponse.status === 200){
+            window.localStorage.removeItem('local_cart');
+            window.location.replace(HOST_URL);
         }
     }
-    window.localStorage.setItem('local_cart', JSON.stringify(cart_items));
 }
-
-function process_checkout(){
-    let completeCheckoutPage = window.location.origin + "/store/complete-checkout";
-    window.location.replace(completeCheckoutPage);
-    window.localStorage.removeItem('local_cart');
-}
-
 
 window.onload = function() {
     populate_cart();

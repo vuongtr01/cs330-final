@@ -40,11 +40,11 @@ def init_db():
 
     with current_app.open_resource('schema.sql') as f:
         db.executescript(f.read().decode('utf8'))
-    
+
     with open(current_app.config["CSVFILE"]) as f:
         reader = csv.reader(f)
         books = list(reader)[1:1001]
-        
+
         for line in books:
             query_db(
                 "INSERT INTO books (title, author, publication_year, publisher, img_url) VALUES(:title, :author, :publication_year, :publisher, :img_url)",
@@ -57,7 +57,7 @@ def init_db():
                 }
                 )
         db.commit()
-            
+
 
 # define a command line called init-db that calls the init_db_command function
 # init_db_command function creates a database

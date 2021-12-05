@@ -16,7 +16,7 @@ def register():
         password = request.form['password']
         re_enter_password = request.form['re-enter-password']
         emailRegex = r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
-        
+
         error = None
 
         if not username:
@@ -86,7 +86,7 @@ def load_logged_in_user():
             {"user_id": user_id},
             one=True
         )
-        
+
 @bp.route('/logout')
 def logout():
     session.clear()
