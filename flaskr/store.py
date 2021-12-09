@@ -1,27 +1,21 @@
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, url_for
+    Blueprint, render_template
 )
-from werkzeug.exceptions import abort
-
 from flaskr.auth import login_required
-from . import db
+from flaskr.models import *
 
 bp = Blueprint('store', __name__)
 
 @bp.route('/')
 @login_required
 def store():
-    books = db.query_db("Select * from books limit 20")
+    books = Book.query.limit(20).all()
     return render_template('store/store.html', books = books)
 
 @bp.route('/item/<int:item_id>')
 @login_required
 def item_details(item_id):
-    item = db.query_db(
-        "Select * from books Where id=:item_id",
-        {"item_id": item_id},
-        one=True
-        )
+    item = Book.query.filter_by(id=item_id).first()
     return render_template('store/item.html', item = item)
 
 @bp.route('/item/orders')

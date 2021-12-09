@@ -5,6 +5,8 @@ from flask import (
 from werkzeug.security import check_password_hash, generate_password_hash
 import re
 from . import db
+from flaskr.models import *
+from sqlalchemy import or_
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -18,7 +20,7 @@ def register():
         emailRegex = r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
 
         error = None
-
+        existed_user = user = User.query.filter(or_(User.email==email, User.username==username)).first()
         if not username:
             error = 'Username is required.'
         elif not email:
@@ -29,14 +31,15 @@ def register():
             error = 'Password is required.'
         elif password != re_enter_password:
             error = 'Password not match.'
+        elif existed_user is not None:
+            error = 'email and username is already existed'
 
         if error is None:
             try:
-                db.query_db(
-                    "INSERT INTO users (username, password, email) VALUES (?, ?, ?)",
-                    (username, generate_password_hash(password), email),
-                )
-                db.get_db().commit()
+                if existed_user is None:
+                    user = User(username=username, password= generate_password_hash(password), email=email)
+                    db.session.add(user)
+                    db.session.commit()
             except Exception as e:
                 error = str(e)
             else:
@@ -53,20 +56,16 @@ def login():
         email = request.form['email']
         password = request.form['password']
         error = None
-        user = db.query_db(
-            "SELECT * FROM users WHERE email = :email",
-            {"email": email},
-            one=True
-        )
+        user = User.query.filter_by(email= email).first()
 
         if user is None:
             error = 'Incorrect username.'
-        elif not check_password_hash(user['password'], password):
+        elif not check_password_hash(user.password, password):
             error = 'Incorrect password.'
 
         if error is None:
             session.clear()
-            session['user_id'] = user['id']
+            session['user_id'] = user.id
             flash("Login successfully", category='success')
             return redirect(url_for('store.store'))
 
@@ -81,11 +80,7 @@ def load_logged_in_user():
     if user_id is None:
         g.user = None
     else:
-        g.user = db.query_db(
-            'SELECT * FROM users WHERE id = :user_id',
-            {"user_id": user_id},
-            one=True
-        )
+        g.user = User.query.filter_by(id=user_id).first()
 
 @bp.route('/logout')
 def logout():

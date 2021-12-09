@@ -56,8 +56,24 @@ function populate_cart(){
 
 }
 
+function removeItem(element){
+    let cart_items = window.localStorage.getItem('local_cart') ? JSON.parse(window.localStorage.getItem('local_cart')) : [];
+    let itemCard = element.parentElement.parentElement;
+    let itemId = itemCard.id.split("-")[1];
+
+    itemCard.parentElement.removeChild(itemCard);
+    for(let i=0; i < cart_items.length; ++i){
+        const {id} = cart_items[i];
+        if (id == itemId){
+            cart_items.splice(i,1);
+        }
+    }
+
+    window.localStorage.setItem('local_cart', JSON.stringify(cart_items));
+}
+
+
 async function process_checkout(){
-    let completeCheckoutPage = window.location.origin + "/store/complete-checkout";
     let cart_items = window.localStorage.getItem('local_cart') ? JSON.parse(window.localStorage.getItem('local_cart')) : [];
     let sendingTime = Date.parse(new Date());
     let borrowedItem = cart_items.map(item => {return {"id": item.id, "time": sendingTime}});
@@ -74,6 +90,8 @@ async function process_checkout(){
             window.localStorage.removeItem('local_cart');
             window.location.replace(HOST_URL);
         }
+    }else{
+        window.location.replace(HOST_URL);
     }
 }
 

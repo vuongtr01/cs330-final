@@ -8,17 +8,17 @@
             {% for book in books%}
                 <div class="col mb-5">
                     <div class="card h-100">
-                        <img style="width: auto; height: 250px;" class="card-img-top" src="{{book['img_url']}}" alt="item image" />
+                        <img style="width: auto; height: 250px;" class="card-img-top" src="{{book.img_url}}" alt="item image" />
                         <div class="card-body p-4">
                             <div class="text-center">
-                                <h5 class="fw-bolder">{{book["title"]}}</h5>
-                                Public: {{book["publication_year"]}}
+                                <h5 class="fw-bolder">{{book.title}}</h5>
+                                Public: {{book.publication_year}}
                             </div>
                         </div>
                         <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                            <div class="text-center"><a class="btn btn-outline-dark mt-auto mb-1" href="{{url_for('store.item_details', item_id=book['id'])}}">View details</a></div>
+                            <div class="text-center"><a class="btn btn-outline-dark mt-auto mb-1" href="{{url_for('store.item_details', item_id=book.id)}}">View details</a></div>
                             <div class="text-center">
-                                <button class="btn btn-outline-dark" type="button" id="add-{{book['id']}}" onclick="add_to_card(this)">
+                                <button class="btn btn-outline-dark" type="button" id="add-{{book.id}}" onclick="add_to_card(this)">
                                     <i class="bi-cart-fill me-1"></i>
                                     Add to cart
                                 </button>

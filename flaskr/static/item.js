@@ -7,14 +7,10 @@ var BASE_URL = window.location.origin + "/api/book/item/";
 async function add_to_card(btn){
     let item_id = btn.id;
     let item = await requestData(item_id);
-    let numItem = parseInt(document.querySelector("#inputQuantity").value);
     let local_cart = window.localStorage.getItem("local_cart")? JSON.parse(window.localStorage.getItem("local_cart")) : [];
     
     let local_item = checkContainItem(local_cart, item_id);
-    if(local_item !== null){
-        local_cart[local_item]["amount"] = local_cart[local_item]["amount"] + numItem;
-    }else{
-        item["amount"] = numItem;
+    if(local_item == null){
         local_cart.push(item);
     }
 

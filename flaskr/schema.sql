@@ -26,5 +26,3 @@ CREATE TABLE order_history(
     FOREIGN KEY (user_id) REFERENCES users (id),
     FOREIGN KEY (book_id) REFERENCES books (id)
 );
-
-INSERT into users (username, password, email) Values ('test1', '12345678', "test1@gmail.com");
